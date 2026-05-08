@@ -1,7 +1,5 @@
 """JSON 파일 기반 OrderRepository 구현체"""
 import dataclasses
-import json
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Union
@@ -9,9 +7,10 @@ from typing import Union
 from app.model.enums import OrderStatus
 from app.model.order import Order
 from app.repository.order_repository import OrderRepository
+from .base_json_repo import BaseJsonRepository
 
 
-class JsonOrderRepository(OrderRepository):
+class JsonOrderRepository(BaseJsonRepository, OrderRepository):
     """JSON 파일 기반 주문 Repository 구현체
 
     저장 규칙:
@@ -22,29 +21,11 @@ class JsonOrderRepository(OrderRepository):
     """
 
     def __init__(self, file_path: Union[str, Path]) -> None:
-        self._file_path = Path(file_path)
-        self._ensure_file()
+        BaseJsonRepository.__init__(self, file_path)
 
     # ------------------------------------------------------------------
-    # 내부 헬퍼
+    # 직렬화 / 역직렬화 헬퍼
     # ------------------------------------------------------------------
-
-    def _ensure_file(self) -> None:
-        """파일이 없으면 빈 JSON 배열로 자동 생성한다."""
-        if not self._file_path.exists():
-            self._write_atomic([])
-
-    def _load(self) -> list[dict]:
-        """JSON 파일을 읽어 dict 리스트로 반환한다."""
-        with open(self._file_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-
-    def _write_atomic(self, records: list[dict]) -> None:
-        """임시 파일에 쓴 후 os.replace로 원자적으로 교체한다."""
-        tmp_path = self._file_path.with_suffix(".tmp")
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            json.dump(records, f, ensure_ascii=False, indent=2)
-        os.replace(tmp_path, self._file_path)
 
     def _to_dict(self, order: Order) -> dict:
         """Order를 JSON 직렬화 가능한 dict로 변환한다.

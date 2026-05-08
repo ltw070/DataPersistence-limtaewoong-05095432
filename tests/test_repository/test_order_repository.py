@@ -1,4 +1,4 @@
-"""Phase 3 Red: JsonOrderRepository PRD 검증 기준 4개 테스트 (tmp_path 사용)"""
+"""Phase 3: JsonOrderRepository PRD 검증 기준 4개 테스트 (tmp_path 사용)"""
 import json
 import pytest
 from datetime import datetime
@@ -7,54 +7,8 @@ from app.model.order import Order
 from app.model.enums import OrderStatus
 from app.repository.json.json_order_repo import JsonOrderRepository
 
-
-@pytest.fixture
-def order_repo(tmp_path):
-    """tmp_path 기반 JsonOrderRepository 픽스처"""
-    file_path = tmp_path / "orders.json"
-    return JsonOrderRepository(file_path)
-
-
-@pytest.fixture
-def order_file_path(tmp_path):
-    """JSON 파일 경로 픽스처"""
-    return tmp_path / "orders.json"
-
-
-@pytest.fixture
-def order_reserved():
-    return Order(
-        order_no="ORD-20260508-0001",
-        sample_id="S-001",
-        customer_name="삼성전자 파운드리",
-        quantity=200,
-        status=OrderStatus.RESERVED,
-        created_at=datetime(2026, 5, 8, 9, 32, 15),
-    )
-
-
-@pytest.fixture
-def order_producing():
-    return Order(
-        order_no="ORD-20260508-0002",
-        sample_id="S-001",
-        customer_name="SK하이닉스",
-        quantity=150,
-        status=OrderStatus.PRODUCING,
-        created_at=datetime(2026, 5, 8, 10, 0, 0),
-    )
-
-
-@pytest.fixture
-def order_confirmed():
-    return Order(
-        order_no="ORD-20260508-0003",
-        sample_id="S-002",
-        customer_name="인텔코리아",
-        quantity=100,
-        status=OrderStatus.CONFIRMED,
-        created_at=datetime(2026, 5, 8, 11, 0, 0),
-    )
+# 공통 픽스처는 conftest.py에서 제공:
+# order_repo, order_file_path, order_reserved, order_producing, order_confirmed
 
 
 class TestOrderSave:
@@ -100,7 +54,6 @@ class TestOrderSave:
             data = json.load(f)
 
         created_at_str = data[0]["created_at"]
-        # ISO 8601 형식으로 파싱 가능해야 한다
         parsed = datetime.fromisoformat(created_at_str)
         assert parsed == datetime(2026, 5, 8, 9, 32, 15)
 

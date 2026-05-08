@@ -1,44 +1,12 @@
-"""Phase 3 Red: JsonSampleRepository PRD 검증 기준 5개 테스트 (tmp_path 사용)"""
+"""Phase 3: JsonSampleRepository PRD 검증 기준 5개 테스트 (tmp_path 사용)"""
 import json
 import pytest
 from pathlib import Path
 from app.model.sample import Sample
 from app.repository.json.json_sample_repo import JsonSampleRepository
 
-
-@pytest.fixture
-def sample_repo(tmp_path):
-    """tmp_path 기반 JsonSampleRepository 픽스처"""
-    file_path = tmp_path / "samples.json"
-    return JsonSampleRepository(file_path)
-
-
-@pytest.fixture
-def sample_file_path(tmp_path):
-    """JSON 파일 경로 픽스처"""
-    return tmp_path / "samples.json"
-
-
-@pytest.fixture
-def sample_a():
-    return Sample(
-        id="S-001",
-        name="실리콘 웨이퍼-8인치",
-        avg_production_time=0.5,
-        yield_rate=0.92,
-        stock=480,
-    )
-
-
-@pytest.fixture
-def sample_b():
-    return Sample(
-        id="S-002",
-        name="갈륨 비소 웨이퍼",
-        avg_production_time=1.2,
-        yield_rate=0.85,
-        stock=200,
-    )
+# 공통 픽스처는 conftest.py에서 제공:
+# sample_repo, sample_file_path, sample_a, sample_b
 
 
 class TestSampleSave:
@@ -232,7 +200,6 @@ class TestSamplePersistence:
 
     def test_data_persists_after_new_instance(self, sample_file_path, sample_a):
         """새 인스턴스를 생성해도 이전에 저장한 데이터가 유지되어야 한다"""
-        # 첫 번째 인스턴스로 저장
         repo1 = JsonSampleRepository(sample_file_path)
         repo1.save(sample_a)
 
